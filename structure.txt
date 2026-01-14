@@ -1,0 +1,76 @@
+PROJ_AI_FOREX_2026/
+│
+├── requirements.txt            # Зависимости (TF 2.15+, MetaTrader5, pandas-ta, streamlit)
+├── __init__.py                 # Глобальный инициализатор проекта fxLSTM
+│
+├── root/                       # CORE: ДИСПЕТЧЕРИЗАЦИЯ И ЗАПУСК
+│   ├── main.py                 # Точка входа Python: жизненный цикл торгового потока
+│   ├── hmi.py                  # Точка входа Streamlit: визуальный запуск и навигация
+│   ├── config.py               # Единый реестр путей, параметров LSTM и констант
+│   └── __init__.py
+│
+├── agents/                     # LOGIC: ТОРГОВЫЕ АЛГОРИТМЫ И РИСКИ
+│   ├── tradingbot.py           # Машина состояний агента (управление статусами OK/WARN/ERROR)
+│   ├── orchestrator.py         # Мозг агента: переключение между обучением, тестом и торговлей
+│   ├── riskmanager.py          # Математика входа: фильтрация сделок по R:R 1:3 и спреду
+│   ├── trader.py               # Исполнитель: отправка торговых приказов в MT5 терминал
+│   ├── positionmanager.py      # Сопровождение сделок: алгоритмы Trailing Stop и Breakeven
+│   └── __init__.py
+│
+├── ai_brain/                   # AI: НЕЙРОСЕТЕВОЙ СТЕК (TensorFlow/Keras)
+│   ├── brain.py                # Предиктор: инференс модели и денормализация цен [H, L, C]
+│   ├── modelbuilder.py         # Архитектор: сборка слоев LSTM (Units, Dropout, Optimizer)
+│   ├── education.py            # Тренер: процесс глубокого обучения на исторических данных
+│   ├── adaptation.py           # Тюнер: механизм онлайн-дообучения (Fine-tuning)
+│   ├── testing.py              # Монитор: расчет MSE и проведение Forward-тестов
+│   ├── validator.py            # Судья: финальная проверка модели перед выходом в Real
+│   └── __init__.py
+│
+├── data_sys/                   # DATA: ПОСТАВЩИКИ И ОБРАБОТКА
+│   ├── mt5_provider.py         # Сетевой уровень обмена данными с MetaTrader 5
+│   ├── yfinance_provider.py    # Поставщик данных Yahoo Finance для режима симуляции (SIM)
+│   ├── datafactory.py          # Процессор: расчет RSI/ATR и подготовка тензоров (Scalers)
+│   ├── databasemanager.py      # SQLite Менеджер: хранение котировок и истории сигналов
+│   ├── stat.py                 # Аналитик: расчет WinRate, Equity и просадок
+│   ├── symbols_directory.json  # Кэш: список доступных пар (обновляется раз в неделю)
+│   ├── forex_main.db           # БД: Основное хранилище реальных торгов
+│   ├── simulation_main.db      # БД: Хранилище результатов симулятора
+│   └── __init__.py
+│
+├── hmi_pages/                  # UI: СТРАНИЦЫ ИНТЕРФЕЙСА (Streamlit)
+│   ├── hmi_main.py             # Dashboard: Главный экран мониторинга и контроля
+│   ├── hmi_soe.py              # SOE: Журнал событий и системный аудит
+│   ├── hmi_stat.py             # Статистика: Визуализация торговых показателей
+│   ├── hmi_charts.py           # Графики: Plotly-визуализация цен и прогнозов ИИ
+│   ├── hmi_settings_view.py    # Настройки: Чистая UI-разметка (использует методы mth)
+│   ├── hmi_utils.py            # Утилиты: стартовые диалоги и загрузка стилей
+│   ├── hmi_commands.json       # Очередь: канал передачи команд от UI к Ядру (Stop/Start)
+│   ├── user_visual_settings.json # Стили: кастомная тема интерфейса (цвета, шрифты)
+│   ├── __init__.py
+│   │
+│   └── settings_methods/       # ATOMIC UI: Атомарные функции настроек (1 функция = 1 файл)
+│       ├── __init__.py         # Агрегатор для вызова методов через mth.
+│       ├── auth_manager.py     # login_dialog: управление доступом к MT5 (RAM-only)
+│       ├── config_saver.py     # save_bots_to_disk: запись списка пар в app_config.json
+│       ├── save_lstm_config.py # Сохранение гиперпараметров нейросети
+│       ├── get_current_lstm_config.py # Чтение текущих настроек обучения
+│       ├── asset_provider.py   # get_available_assets: логика получения тикеров (MT5/YF)
+│       ├── system_cleaner.py   # clear_system_databases: полный сброс текущего режима
+│       ├── lstm_settings_dialog.py # Диалог настройки архитектуры LSTM
+│       ├── render_bots_list.py # [НОВОЕ] UI-блок: отрисовка списка активных ботов
+│       └── render_add_bot_row.py # [НОВОЕ] UI-блок: форма добавления новой пары
+│
+├── system_base/                # SYSTEM: СЕРВИСНЫЕ МОДУЛИ
+│   ├── control.py              # ErrorController: мониторинг MSE (Warn/Error/Rebuild)
+│   ├── logger.py               # Регистратор: логирование в SQLite (режим WAL для 2026)
+│   ├── shutdown_manager.py     # Менеджер выхода: корректная остановка всех процессов
+│   ├── simulation.py           # Эмулятор: движок для прогона стратегии на истории
+│   ├── app_config.json         # Master-Config: статус системы, режим и активные боты
+│   ├── bot_states.json         # State-Sync: живой статус агентов (MSE, Phase) для UI
+│   ├── system_events.db        # БД: Отдельное хранилище системных логов ядра
+│   └── __init__.py
+│
+└── models/                     # ARTIFACTS: ХРАНИЛИЩЕ ОБУЧЕННЫХ МОДЕЛЕЙ
+    ├── *.h5                    # Сохраненные веса обученных LSTM-сетей
+    ├── *.pkl                   # Сериализованные скалеры нормализации (Joblib)
+    └── __init__.py
