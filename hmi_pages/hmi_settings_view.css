@@ -1,0 +1,30 @@
+/* Выравнивание содержимого ВСЕХ колонок по вертикали */
+[data-testid="stColumn"] { 
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* Убираем все отступы у информационных блоков (st.info или div с текстом) */
+[data-testid="stAlertInline"], div[style*="background-color: #0e1117"] {
+    padding: 0.2rem 0.5rem !important; 
+    margin: 0px !important; 
+    /* Устанавливаем минимальную высоту, чтобы контент был по центру */
+    min-height: 2.2rem; 
+}
+
+/* Убираем margin у параграфа внутри инфо-блока */
+[data-testid="stAlertInline"] p, div[style*="background-color: #0e1117"] p { 
+    margin: 0px !important; 
+    line-height: 1 !important; 
+}
+
+/* Убираем отступы вокруг кнопок */
+.stButton button {
+    margin: 0px !important;
+    padding: 0.35rem 0.5rem !important; /* Делаем кнопку компактнее */
+}
+
+/* Убираем отступы у разделителя */
+[data-testid="stDivider"] {
+    margin: 0.5rem 0 !important;
+}

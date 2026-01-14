@@ -1,0 +1,19 @@
+{
+    "show_mode_dialog": true,
+    "saved_mode": "SIM",
+    "trading_allowed": false,
+    "bots_list": [
+        {
+            "pair": "ETH-USD",
+            "tf": "D1"
+        }
+    ],
+    "lstm_config": {
+        "epochs": 50,
+        "batch_size": 32,
+        "learning_rate": 0.001,
+        "lstm_units": 64,
+        "dropout_rate": 0.2,
+        "optimizer": "Adam"
+    }
+}
